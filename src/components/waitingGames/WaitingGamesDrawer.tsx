@@ -2,9 +2,10 @@ import { Gamepad2, Sparkles, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { JourneyStep } from '../../types/patient'
 import { ArabicWordle } from './ArabicWordle'
+import { GuidedBreathingExercise } from './GuidedBreathingExercise'
 import { TilePuzzle } from './TilePuzzle'
 
-type GameTab = 'wordle' | 'puzzle'
+type GameTab = 'wordle' | 'puzzle' | 'breathing'
 
 interface WaitingGamesDrawerProps {
   open: boolean
@@ -103,6 +104,9 @@ export function WaitingGamesDrawer({
           <TabButton active={tab === 'puzzle'} onClick={() => setTab('puzzle')}>
             تركيب الصور
           </TabButton>
+          <TabButton active={tab === 'breathing'} onClick={() => setTab('breathing')}>
+            تمرين التنفس 🫁
+          </TabButton>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-4">
@@ -111,10 +115,14 @@ export function WaitingGamesDrawer({
               اللعبة متوقفة مؤقتاً — انتظر تنبيه الدور
             </p>
           )}
-          {tab === 'wordle' ? (
+          {tab === 'wordle' && (
             <ArabicWordle paused={paused || showTurnAlert} />
-          ) : (
+          )}
+          {tab === 'puzzle' && (
             <TilePuzzle paused={paused || showTurnAlert} />
+          )}
+          {tab === 'breathing' && (
+            <GuidedBreathingExercise paused={paused || showTurnAlert} />
           )}
         </div>
       </aside>
@@ -160,7 +168,7 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 rounded-lg px-2 py-2.5 text-sm font-semibold transition ${
+      className={`flex-1 rounded-lg px-1.5 py-2.5 text-xs font-semibold transition sm:px-2 sm:text-sm ${
         active ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
       }`}
     >
