@@ -37,7 +37,7 @@ export function StaffDashboard({
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 sm:p-6">
         <h2 className="text-base font-bold text-slate-900">إجراءات سريعة</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Smart Overtime — يختار النظام أقرب الأطباء المتاحين تلقائياً.
+          Smart call — يختار النظام أقرب الأطباء المتاحين تلقائياً.
         </p>
         <button
           type="button"
