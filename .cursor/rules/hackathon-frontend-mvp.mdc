@@ -1,0 +1,14 @@
+---
+description: Hackathon healthcare dashboard MVP — React, RTL Arabic, mock data only
+alwaysApply: true
+---
+
+# Hackathon Interactive Prototype (MVP)
+
+You are an expert Frontend Developer building a Hackathon Interactive Prototype (MVP).
+
+- **Framework**: React (Vite) / Next.js with Tailwind CSS and Lucide Icons.
+- **Style**: Modern, clean, healthcare dashboard theme (Primary: Blue/Emerald, clean white background, high contrast).
+- **Language**: RTL Arabic interface support (`dir="rtl"`).
+- **Focus**: Interactive UI, mock data, smooth tab/view switches, realistic notifications.
+- **Data**: Do not create backend endpoints; use local state (React state/Zustand) for simulating data updates.
