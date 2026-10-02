@@ -1,4 +1,5 @@
-import { FlaskConical, SlidersHorizontal } from 'lucide-react'
+import { FlaskConical, SlidersHorizontal, X } from 'lucide-react'
+import { useState } from 'react'
 
 interface MockControlPanelProps {
   criticalCase: boolean
@@ -13,14 +14,39 @@ export function MockControlPanel({
   onToggleCritical,
   onToggleOvertime,
 }: MockControlPanelProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  if (!isOpen) {
+    return (
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-white shadow-xl transition hover:scale-110 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 motion-safe:animate-pulse-soft"
+        aria-label="فتح لوحة تحكم العرض التجريبي"
+        aria-expanded={false}
+      >
+        <SlidersHorizontal className="h-5 w-5" aria-hidden />
+      </button>
+    )
+  }
+
   return (
     <aside
-      className="fixed bottom-4 right-4 z-[60] w-[min(calc(100vw-2rem),20rem)] rounded-2xl border border-slate-700/80 bg-slate-900/95 p-3 text-white shadow-2xl backdrop-blur-md sm:bottom-6 sm:right-6"
+      className="fixed bottom-6 right-6 z-50 w-[min(calc(100vw-2rem),20rem)] rounded-2xl border border-slate-700/80 bg-slate-900/95 p-3 text-white shadow-2xl backdrop-blur-md"
       aria-label="لوحة تحكم العرض التجريبي"
+      aria-expanded={true}
     >
-      <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-2">
-        <SlidersHorizontal className="h-4 w-4 text-sky-400" />
+      <div className="relative mb-3 flex items-center gap-2 border-b border-white/10 pb-2 pe-8">
+        <SlidersHorizontal className="h-4 w-4 shrink-0 text-sky-400" />
         <span className="text-xs font-bold text-slate-200">Mock Control — Pitch</span>
+        <button
+          type="button"
+          onClick={() => setIsOpen(false)}
+          className="absolute right-0 top-0 rounded-lg p-1 text-slate-400 transition hover:bg-white/10 hover:text-white"
+          aria-label="إغلاق لوحة التحكم"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       <div className="space-y-2">
