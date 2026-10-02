@@ -1,8 +1,26 @@
 import { Eye, EyeOff, RefreshCw } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 
 const SIZE = 3
 const SOLVED = [1, 2, 3, 4, 5, 6, 7, 8, 0]
+
+export const PUZZLE_IMAGE_URL =
+  'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=600&auto=format&fit=crop'
+
+function tileSliceStyle(tileNumber: number): CSSProperties {
+  const pos = tileNumber - 1
+  const row = Math.floor(pos / SIZE)
+  const col = pos % SIZE
+  const xPct = SIZE > 1 ? (col / (SIZE - 1)) * 100 : 0
+  const yPct = SIZE > 1 ? (row / (SIZE - 1)) * 100 : 0
+
+  return {
+    backgroundImage: `url(${PUZZLE_IMAGE_URL})`,
+    backgroundSize: '300% 300%',
+    backgroundPosition: `${xPct}% ${yPct}%`,
+    backgroundRepeat: 'no-repeat',
+  }
+}
 
 function countInversions(tiles: number[]) {
   const arr = tiles.filter((t) => t !== 0)
@@ -38,13 +56,15 @@ export function TilePuzzle({ paused }: TilePuzzleProps) {
   const [tiles, setTiles] = useState<number[]>(() => shuffleTiles())
   const [moves, setMoves] = useState(0)
   const [showOriginal, setShowOriginal] = useState(false)
+  const [peekOriginal, setPeekOriginal] = useState(false)
   const [won, setWon] = useState(false)
 
   const emptyIndex = tiles.indexOf(0)
+  const previewOpen = showOriginal || peekOriginal
 
   const tryMove = useCallback(
     (index: number) => {
-      if (paused || showOriginal || won) return
+      if (paused || previewOpen || won) return
       const row = Math.floor(index / SIZE)
       const col = index % SIZE
       const er = Math.floor(emptyIndex / SIZE)
@@ -58,11 +78,14 @@ export function TilePuzzle({ paused }: TilePuzzleProps) {
       setMoves((m) => m + 1)
       if (next.every((t, i) => t === SOLVED[i])) setWon(true)
     },
-    [paused, showOriginal, won, tiles, emptyIndex],
+    [paused, previewOpen, won, tiles, emptyIndex],
   )
 
   useEffect(() => {
-    if (paused) setShowOriginal(false)
+    if (paused) {
+      setShowOriginal(false)
+      setPeekOriginal(false)
+    }
   }, [paused])
 
   const reset = () => {
@@ -70,6 +93,7 @@ export function TilePuzzle({ paused }: TilePuzzleProps) {
     setMoves(0)
     setWon(false)
     setShowOriginal(false)
+    setPeekOriginal(false)
   }
 
   return (
@@ -82,10 +106,18 @@ export function TilePuzzle({ paused }: TilePuzzleProps) {
           <button
             type="button"
             onClick={() => setShowOriginal((v) => !v)}
-            className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
+            onPointerDown={() => setPeekOriginal(true)}
+            onPointerUp={() => setPeekOriginal(false)}
+            onPointerLeave={() => setPeekOriginal(false)}
+            onPointerCancel={() => setPeekOriginal(false)}
+            className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 touch-none select-none"
           >
-            {showOriginal ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-            {showOriginal ? 'إخفاء الأصل' : 'Show Original Image'}
+            {previewOpen ? (
+              <EyeOff className="h-3.5 w-3.5" />
+            ) : (
+              <Eye className="h-3.5 w-3.5" />
+            )}
+            {showOriginal ? 'إخفاء الصورة الأصلية' : 'عرض الصورة الأصلية'}
           </button>
           <button
             type="button"
@@ -93,44 +125,53 @@ export function TilePuzzle({ paused }: TilePuzzleProps) {
             className="inline-flex items-center gap-1 rounded-lg bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-800 ring-1 ring-sky-200"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            جديد
+            لغز جديد
           </button>
         </div>
       </div>
 
-      <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-2xl ring-2 ring-slate-200">
-        {showOriginal ? (
-          <PuzzleFullImage className="h-full w-full" />
-        ) : (
-          <div className="grid h-full w-full grid-cols-3 grid-rows-3 gap-1 bg-slate-200 p-1">
-            {tiles.map((tile, index) => {
-              if (tile === 0) {
-                return <div key={index} className="rounded-md bg-slate-100" />
-              }
-              const pos = tile - 1
-              const row = Math.floor(pos / SIZE)
-              const col = pos % SIZE
+      <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-2xl bg-slate-100 ring-2 ring-slate-200">
+        <div className="grid h-full w-full grid-cols-3 grid-rows-3 gap-1 bg-slate-200/80 p-1">
+          {tiles.map((tile, index) => {
+            if (tile === 0) {
               return (
-                <button
+                <div
                   key={index}
-                  type="button"
-                  disabled={paused}
-                  onClick={() => tryMove(index)}
-                  className="relative overflow-hidden rounded-md ring-1 ring-white/50 transition active:scale-[0.98] disabled:opacity-60"
-                  aria-label={`قطعة ${tile}`}
-                >
-                  <div
-                    className="absolute inset-0 bg-no-repeat"
-                    style={{
-                      background: PUZZLE_BG,
-                      backgroundSize: '300% 300%',
-                      backgroundPosition: `${(col / (SIZE - 1)) * 100}% ${(row / (SIZE - 1)) * 100}%`,
-                    }}
-                  />
-                  <span className="sr-only">{tile}</span>
-                </button>
+                  className="rounded-md bg-transparent"
+                  aria-hidden
+                />
               )
-            })}
+            }
+            return (
+              <button
+                key={index}
+                type="button"
+                disabled={paused || previewOpen}
+                onClick={() => tryMove(index)}
+                className="relative overflow-hidden rounded-md bg-slate-300 ring-1 ring-white/60 transition active:scale-[0.98] disabled:opacity-60"
+                aria-label={`قطعة ${tile}`}
+              >
+                <div className="absolute inset-0" style={tileSliceStyle(tile)} />
+                <span className="sr-only">{tile}</span>
+              </button>
+            )
+          })}
+        </div>
+
+        {previewOpen && (
+          <div
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-white/95 p-3 backdrop-blur-sm"
+            role="dialog"
+            aria-label="معاينة الصورة الأصلية"
+          >
+            <img
+              src={PUZZLE_IMAGE_URL}
+              alt="الصورة المرجعية للأحجية"
+              className="max-h-[85%] w-full rounded-lg object-cover shadow-md ring-1 ring-slate-200"
+            />
+            <p className="text-center text-xs font-semibold text-slate-600">
+              الصورة الأصلية — رتّب البلاطات لتطابق هذا المشهد
+            </p>
           </div>
         )}
       </div>
@@ -138,29 +179,8 @@ export function TilePuzzle({ paused }: TilePuzzleProps) {
       {won && !paused && (
         <p className="text-center text-sm font-bold text-emerald-700">أكملت التركيب — رائع! 🌿</p>
       )}
-      <p className="text-center text-xs text-slate-500">
-        illustration: مشهد طبيعي/صحي مهدئ — اسحب البلاطات بجانب الفراغ
-      </p>
-    </div>
-  )
-}
-
-const PUZZLE_BG =
-  'linear-gradient(145deg, #0ea5e9 0%, #10b981 45%, #6ee7b7 70%, #ecfdf5 100%)'
-
-function PuzzleFullImage({ className }: { className?: string }) {
-  return (
-    <div className={`relative ${className}`} style={{ background: PUZZLE_BG }}>
-      <div className="absolute inset-0 flex items-center justify-center opacity-30">
-        <svg viewBox="0 0 120 120" className="h-24 w-24 text-white" aria-hidden>
-          <path
-            fill="currentColor"
-            d="M60 95c-8-12-22-22-22-38 0-12 10-22 22-22s22 10 22 22c0 16-14 26-22 38z"
-          />
-        </svg>
-      </div>
-      <p className="absolute bottom-3 inset-x-0 text-center text-xs font-medium text-white/90">
-        الصورة الأصلية
+      <p className="text-center text-xs leading-relaxed text-slate-500">
+        اسحب أو اضغط على البلاطات المجاورة للفراغ لترتيب الصورة
       </p>
     </div>
   )

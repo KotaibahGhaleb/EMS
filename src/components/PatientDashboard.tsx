@@ -40,7 +40,10 @@ export function PatientDashboard({
 
       <div className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <FloorPlanMap roomNumber={journey.roomNumber} />
+          <FloorPlanMap
+            roomNumber={journey.roomNumber}
+            currentStep={journey.currentStep}
+          />
         </div>
         <div className="flex flex-col gap-5 lg:col-span-2">
           <WaitingTimeWidget
