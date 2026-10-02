@@ -42,8 +42,47 @@ export function evaluateWordleGuess(
   return result
 }
 
-export const ARABIC_KEYBOARD_ROWS = [
-  ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح', 'ج'],
-  ['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك', 'ط'],
-  ['ئ', 'ء', 'ؤ', 'ر', 'ى', 'ة', 'و', 'ز', 'ظ', 'د', 'ذ'],
+/** Native mobile Arabic keyboard — rows 1 & 2 (11 keys each) */
+export const ARABIC_KEYBOARD_ROW_1 = [
+  'ض',
+  'ص',
+  'ث',
+  'ق',
+  'ف',
+  'غ',
+  'ع',
+  'ه',
+  'خ',
+  'ح',
+  'ج',
+] as const
+
+export const ARABIC_KEYBOARD_ROW_2 = [
+  'ش',
+  'س',
+  'ي',
+  'ب',
+  'ل',
+  'ا',
+  'ت',
+  'ن',
+  'م',
+  'ك',
+  'ط',
+] as const
+
+/** Row 3 letter keys (between Backspace and Enter on mobile layout) */
+export const ARABIC_KEYBOARD_ROW_3 = [
+  'ئ',
+  'ء',
+  'ؤ',
+  'ر',
+  'لا',
+  'ى',
+  'ة',
+  'و',
+  'ز',
+  'ظ',
+  'د',
+  'ذ',
 ] as const

@@ -1,7 +1,9 @@
-import { Sparkles, Trophy } from 'lucide-react'
+import { Delete, Trophy } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import {
-  ARABIC_KEYBOARD_ROWS,
+  ARABIC_KEYBOARD_ROW_1,
+  ARABIC_KEYBOARD_ROW_2,
+  ARABIC_KEYBOARD_ROW_3,
   evaluateWordleGuess,
   pickWordleAnswer,
   splitArabicLetters,
@@ -79,14 +81,27 @@ export function ArabicWordle({ paused }: ArabicWordleProps) {
       return
     }
 
+    const insert = key === 'لا' ? 'لا' : key
     setGuesses((prev) => {
       const next = [...prev]
-      const letters = splitArabicLetters(next[currentRowIndex])
-      if (letters.length >= WORD_LENGTH) return prev
-      next[currentRowIndex] = next[currentRowIndex] + key
+      const combined = next[currentRowIndex] + insert
+      if (splitArabicLetters(combined).length > WORD_LENGTH) return prev
+      next[currentRowIndex] = combined
       return next
     })
   }
+
+  const letterKeyClass = (key: string) => {
+    const st = key === 'لا' ? undefined : keyStates.get(key)
+    if (st === 'green') return 'bg-emerald-500 text-white active:bg-emerald-600'
+    if (st === 'yellow') return 'bg-amber-400 text-white active:bg-amber-500'
+    if (st === 'gray') return 'bg-slate-400 text-white active:bg-slate-500'
+    return 'bg-gray-200 text-slate-800 active:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:active:bg-gray-600'
+  }
+
+  const baseKeyClass =
+    'flex-1 min-w-0 h-10 sm:h-12 flex items-center justify-center rounded text-sm font-semibold disabled:opacity-50'
+  const actionKeyClass = `${baseKeyClass} flex-[1.5] bg-gray-300 text-slate-800 active:bg-gray-400 dark:bg-gray-600 dark:text-white dark:active:bg-gray-500`
 
   const getCellLetter = (rowIndex: number, colIndex: number): string => {
     const letters = splitArabicLetters(guesses[rowIndex] ?? '')
@@ -146,50 +161,56 @@ export function ArabicWordle({ paused }: ArabicWordleProps) {
         </p>
       )}
 
-      <div className="space-y-1.5">
-        {ARABIC_KEYBOARD_ROWS.map((row, i) => (
-          <div key={i} className="flex flex-wrap justify-center gap-1">
-            {row.map((key) => {
-              const st = keyStates.get(key)
-              const bg =
-                st === 'green'
-                  ? 'bg-emerald-500 text-white'
-                  : st === 'yellow'
-                    ? 'bg-amber-400 text-white'
-                    : st === 'gray'
-                      ? 'bg-slate-400 text-white'
-                      : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  disabled={paused || Boolean(finished)}
-                  onClick={() => onKey(key)}
-                  className={`min-w-[2rem] rounded-md px-2 py-2 text-sm font-semibold ${bg} disabled:opacity-50`}
-                >
-                  {key}
-                </button>
-              )
-            })}
+      <div
+        dir="rtl"
+        className="mx-auto w-full max-w-md select-none px-1"
+        aria-label="لوحة مفاتيح عربية"
+      >
+        {[ARABIC_KEYBOARD_ROW_1, ARABIC_KEYBOARD_ROW_2].map((row, i) => (
+          <div key={i} className="my-1 flex w-full items-center justify-center gap-1">
+            {row.map((key) => (
+              <button
+                key={key}
+                type="button"
+                disabled={paused || Boolean(finished)}
+                onClick={() => onKey(key)}
+                className={`${baseKeyClass} ${letterKeyClass(key)}`}
+              >
+                {key}
+              </button>
+            ))}
           </div>
         ))}
-        <div className="flex justify-center gap-2 pt-1">
-          <button
-            type="button"
-            disabled={paused || Boolean(finished)}
-            onClick={() => onKey('⌫')}
-            className="rounded-md bg-slate-200 px-4 py-2 text-sm font-semibold disabled:opacity-50"
-          >
-            ⌫
-          </button>
+
+        <div className="my-1 flex w-full items-center justify-center gap-1">
           <button
             type="button"
             disabled={paused || Boolean(finished)}
             onClick={() => onKey('↵')}
-            className="inline-flex items-center gap-1 rounded-md bg-sky-600 px-6 py-2 text-sm font-bold text-white disabled:opacity-50"
+            className={`${actionKeyClass} bg-sky-600 text-xs font-bold text-white active:bg-sky-700 sm:text-sm`}
+            aria-label="إدخال"
           >
-            <Sparkles className="h-4 w-4" />
             إدخال
+          </button>
+          {ARABIC_KEYBOARD_ROW_3.map((key) => (
+            <button
+              key={key}
+              type="button"
+              disabled={paused || Boolean(finished)}
+              onClick={() => onKey(key)}
+              className={`${baseKeyClass} ${letterKeyClass(key)} ${key === 'لا' ? 'text-xs sm:text-sm' : ''}`}
+            >
+              {key}
+            </button>
+          ))}
+          <button
+            type="button"
+            disabled={paused || Boolean(finished)}
+            onClick={() => onKey('⌫')}
+            className={actionKeyClass}
+            aria-label="حذف"
+          >
+            <Delete className="h-5 w-5" aria-hidden />
           </button>
         </div>
       </div>
