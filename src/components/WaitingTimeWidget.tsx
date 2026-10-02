@@ -1,7 +1,16 @@
-import { Check, ChevronDown, ChevronUp, Clock, TrendingDown, Zap } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp, TrendingDown, Zap } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { JourneyStep } from '../types/patient'
-import { STEP_LABELS, STEP_ORDER } from '../data/mockPatient'
+import { STEP_ORDER } from '../data/mockPatient'
+
+/** Labels for the live current-stage header */
+const CURRENT_STAGE_LABELS: Record<JourneyStep, string> = {
+  registration: 'التسجيل',
+  vitals_triage: 'العلامات الحيوية',
+  waiting_doctor: 'انتظار الطبيب',
+  lab: 'المختبر',
+  discharge: 'الخروج',
+}
 
 /** Shorter labels for completed-step history inside the wait card */
 const COMPLETED_HISTORY_LABELS: Record<JourneyStep, string> = {
@@ -36,6 +45,7 @@ export function WaitingTimeWidget({
   )
   const canExpandHistory = completedSteps.length > 0
   const progress = Math.min(100, Math.max(15, 100 - minutes * 1.2))
+  const stageName = CURRENT_STAGE_LABELS[currentStep]
 
   return (
     <section
@@ -51,20 +61,32 @@ export function WaitingTimeWidget({
           دورك هو التالي
         </p>
       )}
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-medium text-sky-100">الوقت المتوقع للانتظار</p>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-4xl font-bold tabular-nums">{minutes}</span>
-            <span className="text-lg font-semibold text-sky-100">دقيقة</span>
-          </div>
-          <p className="mt-2 text-sm text-white/90">
-            للمرحلة: {STEP_LABELS[currentStep]}
-          </p>
-        </div>
-        <div className="rounded-xl bg-white/15 p-3 backdrop-blur-sm">
-          <Clock className="h-8 w-8" aria-hidden />
-        </div>
+
+      <header className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <p className="text-sm font-medium text-sky-100/95">
+          المرحلة الحالية:{' '}
+          <span className="text-lg font-bold text-white sm:text-xl">{stageName}</span>
+        </p>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm ring-1 ring-white/25">
+          <span
+            className="relative flex h-2 w-2 shrink-0"
+            aria-hidden
+          >
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-200 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(167,243,208,0.9)]" />
+          </span>
+          جاري الآن
+        </span>
+      </header>
+
+      <div className="mt-4 border-b border-white/15 pb-5">
+        <p className="text-xs font-medium text-sky-100/90 sm:text-sm">
+          الوقت المتوقع للانتظار
+        </p>
+        <p className="mt-1 text-2xl font-extrabold tabular-nums tracking-tight text-white sm:text-3xl">
+          {minutes}{' '}
+          <span className="text-xl font-bold text-sky-50 sm:text-2xl">دقيقة</span>
+        </p>
       </div>
 
       <div className="mt-5">
