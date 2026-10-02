@@ -1,4 +1,9 @@
-export type JourneyStep = 'registration' | 'waiting_doctor' | 'lab' | 'discharge'
+export type JourneyStep =
+  | 'registration'
+  | 'vitals_triage'
+  | 'waiting_doctor'
+  | 'lab'
+  | 'discharge'
 
 export type PatientStatus = 'stable' | 'waiting' | 'in_treatment' | 'urgent'
 

@@ -1,9 +1,17 @@
-import { Check, FlaskConical, LogOut, Stethoscope, UserCheck } from 'lucide-react'
+import {
+  Check,
+  FlaskConical,
+  HeartPulse,
+  LogOut,
+  Stethoscope,
+  UserCheck,
+} from 'lucide-react'
 import type { JourneyStep } from '../types/patient'
 import { STEP_LABELS, STEP_ORDER } from '../data/mockPatient'
 
 const stepIcons: Record<JourneyStep, typeof UserCheck> = {
   registration: UserCheck,
+  vitals_triage: HeartPulse,
   waiting_doctor: Stethoscope,
   lab: FlaskConical,
   discharge: LogOut,

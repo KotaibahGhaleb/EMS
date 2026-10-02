@@ -5,6 +5,7 @@ import { ProgressStepper } from './ProgressStepper'
 import { StaffBoostBanner } from './StaffBoostBanner'
 import { UrgentActionButton } from './UrgentActionButton'
 import { WaitingTimeWidget } from './WaitingTimeWidget'
+import { WaitingGamesLauncher } from './waitingGames/WaitingGamesLauncher'
 import type { DemoScenarioState } from '../types/demo'
 import type { PatientJourney } from '../types/patient'
 
@@ -46,6 +47,12 @@ export function PatientDashboard({
             minutes={displayWaitMinutes}
             currentStep={journey.currentStep}
             highlightNext={demo.doctorOvertime}
+          />
+          <WaitingGamesLauncher
+            waitMinutes={displayWaitMinutes}
+            roomNumber={journey.roomNumber}
+            queueTurnActive={demo.doctorOvertime}
+            currentStep={journey.currentStep}
           />
           <UrgentActionButton onUrgentRequest={onUrgent} />
         </div>

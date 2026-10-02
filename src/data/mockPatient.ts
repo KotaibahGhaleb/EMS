@@ -7,6 +7,7 @@ export const APP_NAME = 'مسار'
 
 export const STEP_ORDER: JourneyStep[] = [
   'registration',
+  'vitals_triage',
   'waiting_doctor',
   'lab',
   'discharge',
@@ -14,6 +15,7 @@ export const STEP_ORDER: JourneyStep[] = [
 
 export const STEP_LABELS: Record<JourneyStep, string> = {
   registration: 'اكتمل التسجيل',
+  vitals_triage: 'العلامات الحيوية / الفرز',
   waiting_doctor: 'انتظار الطبيب',
   lab: 'المختبر',
   discharge: 'الخروج',
@@ -21,6 +23,7 @@ export const STEP_LABELS: Record<JourneyStep, string> = {
 
 export const WAIT_MINUTES_BY_STEP: Record<JourneyStep, number> = {
   registration: 45,
+  vitals_triage: 40,
   waiting_doctor: 35,
   lab: 20,
   discharge: 5,
