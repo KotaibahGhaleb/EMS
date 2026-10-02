@@ -61,11 +61,6 @@ export default function App() {
     })
   }, [])
 
-  const handleUrgent = useCallback(() => {
-    setJourney((prev) => ({ ...prev, status: 'urgent' }))
-    setToast('تم إبلاغ فريق التمريض — سيصل إليك خلال دقائق')
-  }, [])
-
   const toggleCritical = useCallback(() => {
     setDemo((prev) => {
       const next = !prev.criticalCase
@@ -139,7 +134,6 @@ export default function App() {
             demo={demo}
             displayWaitMinutes={displayWaitMinutes}
             onAdvanceStep={advanceStep}
-            onUrgent={handleUrgent}
             onTransferSahafa={handleTransferSahafa}
           />
         )}

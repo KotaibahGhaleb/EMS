@@ -1,9 +1,7 @@
 import { ChevronLeft } from 'lucide-react'
 import { CriticalCaseBanner } from './CriticalCaseBanner'
 import { FloorPlanMap } from './FloorPlanMap'
-import { ProgressStepper } from './ProgressStepper'
 import { StaffBoostBanner } from './StaffBoostBanner'
-import { UrgentActionButton } from './UrgentActionButton'
 import { WaitingTimeWidget } from './WaitingTimeWidget'
 import { WaitingGamesLauncher } from './waitingGames/WaitingGamesLauncher'
 import type { DemoScenarioState } from '../types/demo'
@@ -14,7 +12,6 @@ interface PatientDashboardProps {
   demo: DemoScenarioState
   displayWaitMinutes: number
   onAdvanceStep: () => void
-  onUrgent: () => void
   onTransferSahafa: () => void
 }
 
@@ -23,7 +20,6 @@ export function PatientDashboard({
   demo,
   displayWaitMinutes,
   onAdvanceStep,
-  onUrgent,
   onTransferSahafa,
 }: PatientDashboardProps) {
   return (
@@ -36,30 +32,23 @@ export function PatientDashboard({
         onTransfer={onTransferSahafa}
       />
 
-      <ProgressStepper currentStep={journey.currentStep} />
+      <WaitingTimeWidget
+        minutes={displayWaitMinutes}
+        currentStep={journey.currentStep}
+        highlightNext={demo.doctorOvertime}
+      />
 
-      <div className="grid gap-5 lg:grid-cols-5">
-        <div className="lg:col-span-3">
-          <FloorPlanMap
-            roomNumber={journey.roomNumber}
-            currentStep={journey.currentStep}
-          />
-        </div>
-        <div className="flex flex-col gap-5 lg:col-span-2">
-          <WaitingTimeWidget
-            minutes={displayWaitMinutes}
-            currentStep={journey.currentStep}
-            highlightNext={demo.doctorOvertime}
-          />
-          <WaitingGamesLauncher
-            waitMinutes={displayWaitMinutes}
-            roomNumber={journey.roomNumber}
-            queueTurnActive={demo.doctorOvertime}
-            currentStep={journey.currentStep}
-          />
-          <UrgentActionButton onUrgentRequest={onUrgent} />
-        </div>
-      </div>
+      <WaitingGamesLauncher
+        waitMinutes={displayWaitMinutes}
+        roomNumber={journey.roomNumber}
+        queueTurnActive={demo.doctorOvertime}
+        currentStep={journey.currentStep}
+      />
+
+      <FloorPlanMap
+        roomNumber={journey.roomNumber}
+        currentStep={journey.currentStep}
+      />
 
       <div className="flex justify-center border-t border-slate-200 pt-6">
         <button
