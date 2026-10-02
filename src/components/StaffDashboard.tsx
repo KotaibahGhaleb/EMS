@@ -46,7 +46,7 @@ export function StaffDashboard({
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-indigo-600 to-sky-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:from-indigo-700 hover:to-sky-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           <PhoneCall className="h-5 w-5" />
-          Send Smart Overtime Call to Doctors
+          Send Smart  Call to Doctors
         </button>
         {overtimeSent && (
           <p className="mt-3 text-sm font-medium text-emerald-700">
