@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { RelativeShareDashboard } from './components/RelativeShareDashboard'
 import { MedicalHistoryTimeline } from './components/MedicalHistoryTimeline'
 import { MockControlPanel } from './components/MockControlPanel'
 import { PatientDashboard } from './components/PatientDashboard'
@@ -19,6 +20,12 @@ import { initialDemoState } from './types/demo'
 import type { DemoScenarioState } from './types/demo'
 import type { PatientJourney } from './types/patient'
 import type { AppView } from './types/view'
+import { parseShareTokenFromUrl, subscribeShareRoute } from './lib/shareRouting'
+import {
+  DEMO_EMERGENCY_SESSION_ID,
+  getActiveShareTokenForSession,
+  syncEmergencyShare,
+} from './services/emergencyShareService'
 
 function resolveWaitMinutes(
   journey: PatientJourney,
@@ -36,6 +43,9 @@ export default function App() {
   const [demo, setDemo] = useState<DemoScenarioState>(initialDemoState)
   const [toast, setToast] = useState<string | null>(null)
   const [smartOvertimeSent, setSmartOvertimeSent] = useState(false)
+  const [shareRouteToken, setShareRouteToken] = useState<string | null>(() =>
+    parseShareTokenFromUrl(),
+  )
 
   const displayHospital = demo.transferredToSahafa
     ? SAHAFA_HOSPITAL_NAME
@@ -115,6 +125,47 @@ export default function App() {
       ? 'waiting'
       : journey.status
 
+  const sharePatientStatus = topBarStatus
+
+  const shareInput = useMemo(
+    () => ({
+      emergencySessionId: DEMO_EMERGENCY_SESSION_ID,
+      patientName: PATIENT_NAME,
+      hospitalName: displayHospital,
+      currentStep: journey.currentStep,
+      triageStatusLabel: STEP_LABELS[journey.currentStep],
+      patientStatus: sharePatientStatus,
+      roomNumber: journey.roomNumber,
+      etaMinutes: displayWaitMinutes,
+    }),
+    [
+      displayHospital,
+      displayWaitMinutes,
+      journey.currentStep,
+      journey.roomNumber,
+      sharePatientStatus,
+    ],
+  )
+
+  useEffect(() => subscribeShareRoute(setShareRouteToken), [])
+
+  useEffect(() => {
+    const token = getActiveShareTokenForSession(DEMO_EMERGENCY_SESSION_ID)
+    if (!token) return
+    void syncEmergencyShare(token, {
+      current_step: journey.currentStep,
+      triage_status_label: STEP_LABELS[journey.currentStep],
+      patient_status: sharePatientStatus,
+      room_number: journey.roomNumber,
+      eta_minutes: displayWaitMinutes,
+      hospital_name: displayHospital,
+    })
+  }, [journey, displayWaitMinutes, displayHospital, sharePatientStatus])
+
+  if (shareRouteToken) {
+    return <RelativeShareDashboard token={shareRouteToken} />
+  }
+
   return (
     <div dir="rtl" className="min-h-screen pb-28 font-sans sm:pb-8">
       <div className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur-md">
@@ -135,6 +186,8 @@ export default function App() {
             displayWaitMinutes={displayWaitMinutes}
             onAdvanceStep={advanceStep}
             onTransferSahafa={handleTransferSahafa}
+            shareInput={shareInput}
+            onNotify={setToast}
           />
         )}
         {activeView === 'history' && (
